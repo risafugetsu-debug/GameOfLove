@@ -17,6 +17,7 @@ import { AddDateSheet } from '@/components/sheets/AddDateSheet';
 import { EditPersonSheet } from '@/components/sheets/EditPersonSheet';
 import { EliminateSheet } from '@/components/sheets/EliminateSheet';
 import { DateHistoryView } from '@/components/sheets/DateHistoryView';
+import { MoveCelebrationView } from '@/components/overlays/MoveCelebrationView';
 
 export default function BoardScreen() {
   const openAddSheet = useBoardStore((s) => s.openAddSheet);
@@ -62,6 +63,7 @@ export default function BoardScreen() {
           <DateHistoryView />
         </SafeAreaView>
       </BottomSheetModalProvider>
+      <MoveCelebrationView />
     </GestureHandlerRootView>
   );
 }
