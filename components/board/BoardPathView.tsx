@@ -123,10 +123,10 @@ export function BoardPathView({ width, height, people, onPieceTap }: Props) {
             </Text>
           );
         })}
-        {people.map((person) => {
+        {people.map((person, idx) => {
           const staggerIndex = people
-            .filter((p) => p.position === person.position)
-            .indexOf(person);
+            .slice(0, idx)
+            .filter((p) => p.position === person.position).length;
           return (
             <PieceView
               key={person.id}
