@@ -1,7 +1,7 @@
 {
   "name": "gameoflove",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,14 +9,39 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.2.8",
+    "@shopify/react-native-skia": "^2.5.3",
+    "drizzle-orm": "^0.45.1",
     "expo": "~55.0.8",
+    "expo-image-manipulator": "~55.0.11",
+    "expo-image-picker": "~55.0.13",
+    "expo-router": "~55.0.7",
+    "expo-sqlite": "~55.0.11",
     "expo-status-bar": "~55.0.4",
     "react": "19.2.0",
-    "react-native": "0.83.2"
+    "react-native": "0.83.2",
+    "react-native-gesture-handler": "~2.30.0",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.2",
+    "drizzle-kit": "^0.31.10",
+    "jest": "^30.3.0",
+    "jest-expo": "^55.0.11",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
+  }
 }

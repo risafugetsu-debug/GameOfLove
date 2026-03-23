@@ -23,8 +23,18 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "scheme": "gameoflove",
     "web": {
+      "bundler": "metro",
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        { "photosPermission": "The app needs access to your photos to set a profile picture." }
+      ]
+    ]
   }
 }
