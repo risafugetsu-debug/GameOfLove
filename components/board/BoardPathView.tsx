@@ -5,6 +5,7 @@ import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { colors, MILESTONES } from '@/constants/theme';
 import { sectionCenter } from '@/helpers/board';
+import { PieceView } from './PieceView';
 
 interface PersonOnBoard {
   id: string;
@@ -120,6 +121,23 @@ export function BoardPathView({ width, height, people, onPieceTap }: Props) {
             >
               {m.emoji}
             </Text>
+          );
+        })}
+        {people.map((person) => {
+          const staggerIndex = people
+            .filter((p) => p.position === person.position)
+            .indexOf(person);
+          return (
+            <PieceView
+              key={person.id}
+              personId={person.id}
+              position={person.position}
+              colorHex={person.colorHex}
+              photoData={person.photoData}
+              staggerIndex={staggerIndex}
+              canvasWidth={width}
+              canvasHeight={height}
+            />
           );
         })}
       </View>

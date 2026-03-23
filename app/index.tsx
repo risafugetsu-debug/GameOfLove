@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet, View, LayoutChangeEvent } from 'react-native';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { eq } from 'drizzle-orm';
 import { colors, typography } from '@/constants/theme';
+import { db } from '@/db/client';
+import { datePeople } from '@/db/schema';
 import { useBoardStore } from '@/store/boardStore';
 import { BoardPathView } from '@/components/board/BoardPathView';
+import { DateChipRow } from '@/components/board/DateChipRow';
+import { EmptyBoardOverlay } from '@/components/board/EmptyBoardOverlay';
 
 export default function BoardScreen() {
   const openAddSheet = useBoardStore((s) => s.openAddSheet);
   const selectPerson = useBoardStore((s) => s.selectPerson);
-  const openLogSheet = useBoardStore((s) => s.openLogSheet);
   const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
+
+  const { data: activePeople = [] } = useLiveQuery(
+    db.select().from(datePeople).where(eq(datePeople.isEliminated, false))
+  );
 
   const onBoardLayout = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
     setBoardSize({ width, height });
-  };
-
-  const handlePieceTap = (personId: string) => {
-    selectPerson(personId);
-    openLogSheet();
   };
 
   return (
@@ -33,11 +37,13 @@ export default function BoardScreen() {
           <BoardPathView
             width={boardSize.width}
             height={boardSize.height}
-            people={[]}
-            onPieceTap={handlePieceTap}
+            people={activePeople}
+            onPieceTap={selectPerson}
           />
         )}
+        {activePeople.length === 0 && <EmptyBoardOverlay />}
       </View>
+      <DateChipRow people={activePeople} onPress={selectPerson} />
     </SafeAreaView>
   );
 }
