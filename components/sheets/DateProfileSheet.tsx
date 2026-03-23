@@ -88,10 +88,10 @@ export function DateProfileSheet() {
   if (!person) return null;
 
   const logCTADisabled = person.isEliminated || person.position === 30;
-  const logCTALabel = person.position === 30
-    ? 'Already The One 💝'
-    : person.isEliminated
+  const logCTALabel = person.isEliminated
     ? ''
+    : person.position === 30
+    ? 'Already The One 💝'
     : 'Log New Date';
 
   return (
@@ -131,7 +131,7 @@ export function DateProfileSheet() {
               {entry.note || '—'}
             </Text>
             <Text style={[typography.caption, { color: colors.textSecondary }]}>
-              {formatDistanceToNow(entry.loggedAt, { addSuffix: true })}
+              {entry.loggedAt ? formatDistanceToNow(entry.loggedAt, { addSuffix: true }) : ''}
             </Text>
           </View>
         ))}
