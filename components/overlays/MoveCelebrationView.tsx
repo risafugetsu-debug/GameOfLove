@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { useBoardStore } from '@/store/boardStore';
@@ -9,6 +9,12 @@ export function MoveCelebrationView() {
   const confettiRef = useRef<any>(null);
   const opacity = useRef(new Animated.Value(0)).current;
 
+  const dismiss = useCallback(() => {
+    Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+      setMoveResult(null);
+    });
+  }, [opacity, setMoveResult]);
+
   useEffect(() => {
     if (moveResult) {
       Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }).start();
@@ -16,13 +22,7 @@ export function MoveCelebrationView() {
       const timer = setTimeout(() => dismiss(), 3000);
       return () => clearTimeout(timer);
     }
-  }, [moveResult]);
-
-  const dismiss = () => {
-    Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-      setMoveResult(null);
-    });
-  };
+  }, [moveResult, dismiss]);
 
   if (!moveResult) return null;
 
