@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, StyleSheet, View, LayoutChangeEvent } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { colors, typography } from '@/constants/theme';
@@ -9,6 +11,7 @@ import { useBoardStore } from '@/store/boardStore';
 import { BoardPathView } from '@/components/board/BoardPathView';
 import { DateChipRow } from '@/components/board/DateChipRow';
 import { EmptyBoardOverlay } from '@/components/board/EmptyBoardOverlay';
+import { DateProfileSheet } from '@/components/sheets/DateProfileSheet';
 
 export default function BoardScreen() {
   const openAddSheet = useBoardStore((s) => s.openAddSheet);
@@ -25,26 +28,31 @@ export default function BoardScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.root}>
-      <View style={styles.header}>
-        <Text style={typography.heading}>💝 Game of Love</Text>
-        <TouchableOpacity onPress={openAddSheet} style={styles.addBtn}>
-          <Text style={[typography.body, { color: colors.accent }]}>+ Add</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.board} onLayout={onBoardLayout}>
-        {boardSize.width > 0 && (
-          <BoardPathView
-            width={boardSize.width}
-            height={boardSize.height}
-            people={activePeople}
-            onPieceTap={selectPerson}
-          />
-        )}
-        {activePeople.length === 0 && <EmptyBoardOverlay />}
-      </View>
-      <DateChipRow people={activePeople} onPress={selectPerson} />
-    </SafeAreaView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetModalProvider>
+        <SafeAreaView style={styles.root}>
+          <View style={styles.header}>
+            <Text style={typography.heading}>💝 Game of Love</Text>
+            <TouchableOpacity onPress={openAddSheet} style={styles.addBtn}>
+              <Text style={[typography.body, { color: colors.accent }]}>+ Add</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.board} onLayout={onBoardLayout}>
+            {boardSize.width > 0 && (
+              <BoardPathView
+                width={boardSize.width}
+                height={boardSize.height}
+                people={activePeople}
+                onPieceTap={selectPerson}
+              />
+            )}
+            {activePeople.length === 0 && <EmptyBoardOverlay />}
+          </View>
+          <DateChipRow people={activePeople} onPress={selectPerson} />
+          <DateProfileSheet />
+        </SafeAreaView>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }
 
