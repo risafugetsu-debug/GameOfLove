@@ -1,4 +1,5 @@
-import { Canvas, Path, Skia, BlurMask, Circle, Group } from '@shopify/react-native-skia';
+import { Canvas, Path, Skia, BlurMask, Circle } from '@shopify/react-native-skia';
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
@@ -27,8 +28,10 @@ function buildRoadPath(width: number, height: number) {
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1];
     const curr = points[i];
-    const prevRow = Math.floor((i - 1) / 6);
-    const currRow = Math.floor(i / 6);
+    // Match sectionCenter's model: positions 1–6 → row 0, 7–12 → row 1, etc.
+    // Position 0 is START (treated as row 0).
+    const prevRow = i <= 1 ? 0 : Math.floor((i - 2) / 6);
+    const currRow = Math.floor((i - 1) / 6);
     if (currRow !== prevRow) {
       // U-turn: cubic bezier
       const cpx = curr.x;
@@ -42,7 +45,7 @@ function buildRoadPath(width: number, height: number) {
 }
 
 export function BoardPathView({ width, height, people, onPieceTap }: Props) {
-  const roadPath = buildRoadPath(width, height);
+  const roadPath = useMemo(() => buildRoadPath(width, height), [width, height]);
 
   const tap = Gesture.Tap().onEnd((e) => {
     'worklet';
@@ -99,11 +102,7 @@ export function BoardPathView({ width, height, people, onPieceTap }: Props) {
           {/* Milestone circles */}
           {MILESTONES.map((m) => {
             const pt = sectionCenter(m.position, width, height);
-            return (
-              <Group key={m.position}>
-                <Circle cx={pt.x} cy={pt.y} r={14} color="#3d0030" />
-              </Group>
-            );
+            return <Circle key={m.position} cx={pt.x} cy={pt.y} r={14} color="#3d0030" />;
           })}
         </Canvas>
         {/* Emoji overlays (Skia can't render emoji) */}
