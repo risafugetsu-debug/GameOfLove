@@ -12,6 +12,7 @@ import { BoardPathView } from '@/components/board/BoardPathView';
 import { DateChipRow } from '@/components/board/DateChipRow';
 import { EmptyBoardOverlay } from '@/components/board/EmptyBoardOverlay';
 import { DateProfileSheet } from '@/components/sheets/DateProfileSheet';
+import { LogDateSheet } from '@/components/sheets/LogDateSheet';
 
 export default function BoardScreen() {
   const openAddSheet = useBoardStore((s) => s.openAddSheet);
@@ -50,6 +51,7 @@ export default function BoardScreen() {
           </View>
           <DateChipRow people={activePeople} onPress={selectPerson} />
           <DateProfileSheet />
+          <LogDateSheet />
         </SafeAreaView>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
