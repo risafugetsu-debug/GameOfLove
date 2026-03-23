@@ -23,31 +23,33 @@ export async function logDate(
   const entryId = Crypto.randomUUID();
   const now = new Date();
 
-  await db.insert(dateEntries).values({
-    id: entryId,
-    personId,
-    note,
-    vibe,
-    movement,
-    loggedAt: now,
-  });
-
   let newPosition: number | null = null;
   let isEliminated = false;
 
-  if (vibe === 'eliminate') {
-    await db
-      .update(datePeople)
-      .set({ isEliminated: true, eliminatedAt: now })
-      .where(eq(datePeople.id, personId));
-    isEliminated = true;
-  } else {
-    newPosition = clamp(person.position + movement!);
-    await db
-      .update(datePeople)
-      .set({ position: newPosition })
-      .where(eq(datePeople.id, personId));
-  }
+  await db.transaction(async (tx) => {
+    await tx.insert(dateEntries).values({
+      id: entryId,
+      personId,
+      note,
+      vibe,
+      movement,
+      loggedAt: now,
+    });
+
+    if (vibe === 'eliminate') {
+      await tx
+        .update(datePeople)
+        .set({ isEliminated: true, eliminatedAt: now })
+        .where(eq(datePeople.id, personId));
+      isEliminated = true;
+    } else {
+      newPosition = clamp(person.position + movement!);
+      await tx
+        .update(datePeople)
+        .set({ position: newPosition })
+        .where(eq(datePeople.id, personId));
+    }
+  });
 
   const milestone = newPosition !== null ? milestoneAt(newPosition) : null;
   const isTheOne = newPosition === 30;
@@ -105,5 +107,6 @@ async function compressPhoto(uri: string): Promise<string> {
     [{ resize: { width: 400 } }], // single dimension preserves aspect ratio
     { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true },
   );
-  return result.base64!;
+  if (!result.base64) throw new Error('Photo compression failed: no base64 data');
+  return result.base64;
 }
