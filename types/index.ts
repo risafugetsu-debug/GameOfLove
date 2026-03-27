@@ -4,6 +4,7 @@ export interface Milestone {
   position: number;
   emoji: string;
   name: string;
+  description: string;
 }
 
 export interface MoveResult {

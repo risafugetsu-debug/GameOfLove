@@ -25,9 +25,9 @@ export const PIECE_COLORS = [
 ] as const;
 
 export const MILESTONES: Milestone[] = [
-  { position: 5,  emoji: '💋', name: 'First Kiss' },
-  { position: 10, emoji: '👫', name: 'Met the Friends' },
-  { position: 17, emoji: '🎶', name: 'Special Moment' },
-  { position: 24, emoji: '❤️', name: 'Are We Official?' },
-  { position: 30, emoji: '💝', name: 'The One' },
+  { position: 5,  emoji: '💋', name: 'First Kiss',       description: "You finally kissed! Things are heating up." },
+  { position: 10, emoji: '👫', name: 'Met the Friends',  description: "Big step — they're getting integrated into your world." },
+  { position: 17, emoji: '🎶', name: 'Special Moment',   description: "A moment you'll both remember." },
+  { position: 24, emoji: '❤️', name: 'Are We Official?', description: "Time to define the relationship." },
+  { position: 30, emoji: '💝', name: 'The One',          description: "You found them." },
 ];
