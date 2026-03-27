@@ -41,52 +41,41 @@ export function logDate(
   let isEliminated = false;
 
   if (targetPosition !== undefined) {
-    // Milestone jump: use full delta, skip vibeToMovement result
     movement = targetPosition - person.position;
     newPosition = targetPosition;
+  } else {
+    movement = vibeToMovement(vibe);
+  }
 
-    db.transaction((tx) => {
-      tx.insert(dateEntries).values({
-        id: entryId,
-        personId,
-        note,
-        vibe,
-        movement,
-        loggedAt: now,
-      }).run();
+  db.transaction((tx) => {
+    tx.insert(dateEntries).values({
+      id: entryId,
+      personId,
+      note,
+      vibe,
+      movement,
+      loggedAt: now,
+    }).run();
 
+    if (targetPosition !== undefined) {
       tx.update(datePeople)
         .set({ position: newPosition! })
         .where(eq(datePeople.id, personId))
         .run();
-    });
-  } else {
-    movement = vibeToMovement(vibe);
-    db.transaction((tx) => {
-      tx.insert(dateEntries).values({
-        id: entryId,
-        personId,
-        note,
-        vibe,
-        movement,
-        loggedAt: now,
-      }).run();
-
-      if (vibe === 'eliminate') {
-        tx.update(datePeople)
-          .set({ isEliminated: true, eliminatedAt: now })
-          .where(eq(datePeople.id, personId))
-          .run();
-        isEliminated = true;
-      } else {
-        newPosition = clamp(person.position + movement!);
-        tx.update(datePeople)
-          .set({ position: newPosition })
-          .where(eq(datePeople.id, personId))
-          .run();
-      }
-    });
-  }
+    } else if (vibe === 'eliminate') {
+      tx.update(datePeople)
+        .set({ isEliminated: true, eliminatedAt: now })
+        .where(eq(datePeople.id, personId))
+        .run();
+      isEliminated = true;
+    } else {
+      newPosition = clamp(person.position + movement!);
+      tx.update(datePeople)
+        .set({ position: newPosition })
+        .where(eq(datePeople.id, personId))
+        .run();
+    }
+  });
 
   const milestone = newPosition !== null ? milestoneAt(newPosition) : null;
   const isTheOne = newPosition === 30;
