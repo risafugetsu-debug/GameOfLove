@@ -1,9 +1,10 @@
 import { Canvas, Path, Skia, BlurMask, Circle } from '@shopify/react-native-skia';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import { colors, MILESTONES } from '@/constants/theme';
+import type { Milestone } from '@/types';
 import { sectionCenter } from '@/helpers/board';
 import { PieceView } from './PieceView';
 
@@ -20,21 +21,22 @@ interface Props {
   height: number;
   people: PersonOnBoard[];
   onPieceTap: (personId: string) => void;
+  onMilestoneTap: (milestone: Milestone) => void;
 }
 
-function buildRoadPath(width: number, height: number) {
+const MILESTONE_SET = new Set(MILESTONES.map((m) => m.position));
+
+function buildConnectorPath(width: number, height: number) {
+  // Thin line connecting pos1 → pos30; START (pos0) is a detached circle.
   const points = Array.from({ length: 31 }, (_, i) => sectionCenter(i, width, height));
   const path = Skia.Path.Make();
-  path.moveTo(points[0].x, points[0].y);
-  for (let i = 1; i < points.length; i++) {
+  path.moveTo(points[1].x, points[1].y);
+  for (let i = 2; i < points.length; i++) {
     const prev = points[i - 1];
     const curr = points[i];
-    // Match sectionCenter's model: positions 1–6 → row 0, 7–12 → row 1, etc.
-    // Position 0 is START (treated as row 0).
-    const prevRow = i <= 1 ? 0 : Math.floor((i - 2) / 6);
+    const prevRow = Math.floor((i - 2) / 6);
     const currRow = Math.floor((i - 1) / 6);
     if (currRow !== prevRow) {
-      // U-turn: cubic bezier
       const cpx = curr.x;
       const cpy = prev.y + (curr.y - prev.y) * 0.5;
       path.cubicTo(prev.x, cpy, cpx, cpy, curr.x, curr.y);
@@ -45,84 +47,132 @@ function buildRoadPath(width: number, height: number) {
   return path;
 }
 
-export function BoardPathView({ width, height, people, onPieceTap }: Props) {
-  const roadPath = useMemo(() => buildRoadPath(width, height), [width, height]);
+export function BoardPathView({ width, height, people, onPieceTap, onMilestoneTap }: Props) {
+  const connectorPath = useMemo(() => buildConnectorPath(width, height), [width, height]);
+
+  const spaces = useMemo(
+    () =>
+      Array.from({ length: 31 }, (_, i) => ({
+        pos: i,
+        ...sectionCenter(i, width, height),
+        isMilestone: MILESTONE_SET.has(i),
+        isStart: i === 0,
+      })),
+    [width, height],
+  );
+
+  const hitAreas = useMemo(
+    () =>
+      people.map((person, staggerIdx) => {
+        const pt = sectionCenter(person.position, width, height);
+        const samePosBefore = people.slice(0, staggerIdx).filter(
+          (p) => p.position === person.position,
+        );
+        return { id: person.id, cx: pt.x + samePosBefore.length * 8, cy: pt.y };
+      }),
+    [people, width, height],
+  );
+
+  const milestoneCenters = useMemo(
+    () => MILESTONES.map((m) => ({ milestone: m, ...sectionCenter(m.position, width, height) })),
+    [width, height],
+  );
 
   const tap = Gesture.Tap().onEnd((e) => {
     'worklet';
     const { x, y } = e;
-    for (let staggerIdx = 0; staggerIdx < people.length; staggerIdx++) {
-      const person = people[staggerIdx];
-      const pt = sectionCenter(person.position, width, height);
-      // People at the same position are staggered by 8px each
-      const samePosBefore = people.slice(0, staggerIdx).filter(
-        (p) => p.position === person.position,
-      );
-      const offsetX = samePosBefore.length * 8;
-      const cx = pt.x + offsetX;
-      const cy = pt.y;
+    for (let i = 0; i < hitAreas.length; i++) {
+      const { id, cx, cy } = hitAreas[i];
       const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
       if (dist <= 20) {
-        runOnJS(onPieceTap)(person.id);
+        runOnJS(onPieceTap)(id);
         return;
       }
     }
   });
 
+  const milestoneTap = Gesture.Tap().onEnd((e) => {
+    'worklet';
+    const { x, y } = e;
+    for (let i = 0; i < milestoneCenters.length; i++) {
+      const { milestone, x: cx, y: cy } = milestoneCenters[i];
+      const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
+      if (dist <= 20) {
+        runOnJS(onMilestoneTap)(milestone);
+        return;
+      }
+    }
+  });
+
+  const gesture = Gesture.Exclusive(milestoneTap, tap);
+
   return (
-    <GestureDetector gesture={tap}>
+    <GestureDetector gesture={gesture}>
       <View style={{ width, height }}>
         <Canvas style={{ width, height }}>
-          {/* Glow layer */}
+          {/* Subtle ambient glow on the connector */}
           <Path
-            path={roadPath}
-            color="rgba(255,105,180,0.2)"
+            path={connectorPath}
+            color="rgba(255,105,180,0.18)"
             style="stroke"
-            strokeWidth={50}
+            strokeWidth={22}
           >
-            <BlurMask blur={15} style="normal" />
+            <BlurMask blur={8} style="normal" />
           </Path>
-          {/* Border */}
+          {/* Thin connector line between spaces */}
           <Path
-            path={roadPath}
-            color={colors.roadBorder}
+            path={connectorPath}
+            color="rgba(139,26,74,0.65)"
             style="stroke"
-            strokeWidth={36}
+            strokeWidth={3}
             strokeCap="round"
             strokeJoin="round"
           />
-          {/* Surface */}
-          <Path
-            path={roadPath}
-            color={colors.roadSurface}
-            style="stroke"
-            strokeWidth={26}
-            strokeCap="round"
-            strokeJoin="round"
-          />
-          {/* Milestone circles */}
-          {MILESTONES.map((m) => {
-            const pt = sectionCenter(m.position, width, height);
-            return <Circle key={m.position} cx={pt.x} cy={pt.y} r={14} color="#3d0030" />;
+
+          {/* Space circles */}
+          {spaces.map(({ pos, x, y, isMilestone, isStart }) => {
+            const r = isMilestone ? 16 : 13;
+            const fill = isStart ? colors.accent
+              : isMilestone ? '#1a0030'
+              : '#f0c8dc';
+            const border = isStart ? '#ffffff'
+              : isMilestone ? colors.accent
+              : colors.roadBorder;
+            const bw = isMilestone ? 2.5 : 2;
+            return (
+              <Fragment key={pos}>
+                {/* drop shadow */}
+                <Circle cx={x} cy={y + 2.5} r={r} color="rgba(0,0,0,0.28)" />
+                {/* fill */}
+                <Circle cx={x} cy={y} r={r} color={fill} />
+                {/* border */}
+                <Circle cx={x} cy={y} r={r} color={border} style="stroke" strokeWidth={bw} />
+              </Fragment>
+            );
           })}
         </Canvas>
-        {/* Emoji overlays (Skia can't render emoji) */}
+
+        {/* Milestone emoji overlays — centered on their circles */}
         {MILESTONES.map((m) => {
           const pt = sectionCenter(m.position, width, height);
           return (
-            <Text
+            <View
               key={m.position}
               style={{
                 position: 'absolute',
-                left: pt.x - 12,
-                top: pt.y - 28,
-                fontSize: 18,
+                left: pt.x - 16,
+                top: pt.y - 16,
+                width: 32,
+                height: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {m.emoji}
-            </Text>
+              <Text style={{ fontSize: 13 }}>{m.emoji}</Text>
+            </View>
           );
         })}
+
         {people.map((person, idx) => {
           const staggerIndex = people
             .slice(0, idx)
