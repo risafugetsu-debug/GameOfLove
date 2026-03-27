@@ -53,7 +53,7 @@ export function MilestoneJumpSheet({ isVisible, onClose }: Props) {
     } else {
       sheetRef.current?.close();
     }
-  }, [isVisible, selectedMilestone?.position]);
+  }, [isVisible, selectedMilestone?.position, eligiblePlayers.length]);
 
   const handleSave = async () => {
     if (!selectedPersonId || !selectedVibe || !selectedMilestone || saving) return;
