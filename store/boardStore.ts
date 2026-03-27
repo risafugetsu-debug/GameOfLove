@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { MoveResult } from '@/types';
+import type { MoveResult, Milestone } from '@/types';
 
 interface BoardStore {
   selectedPersonId: string | null;
@@ -9,6 +9,9 @@ interface BoardStore {
   showingEliminateSheet: boolean;
   showingHistorySheet: boolean;
   moveResult: MoveResult | null;
+  boardVersion: number;
+  selectedMilestone: Milestone | null;
+  showingMilestoneJumpSheet: boolean;
 
   selectPerson: (id: string | null) => void;
   openLogSheet: () => void;
@@ -22,6 +25,9 @@ interface BoardStore {
   openHistorySheet: () => void;
   closeHistorySheet: () => void;
   setMoveResult: (result: MoveResult | null) => void;
+  invalidateBoard: () => void;
+  openMilestoneJumpSheet: (milestone: Milestone) => void;
+  closeMilestoneJumpSheet: () => void;
 }
 
 export const useBoardStore = create<BoardStore>((set) => ({
@@ -32,6 +38,9 @@ export const useBoardStore = create<BoardStore>((set) => ({
   showingEliminateSheet: false,
   showingHistorySheet: false,
   moveResult: null,
+  boardVersion: 0,
+  selectedMilestone: null,
+  showingMilestoneJumpSheet: false,
 
   selectPerson: (id) => set({ selectedPersonId: id }),
   openLogSheet: () => set({ showingLogSheet: true }),
@@ -45,4 +54,7 @@ export const useBoardStore = create<BoardStore>((set) => ({
   openHistorySheet: () => set({ showingHistorySheet: true }),
   closeHistorySheet: () => set({ showingHistorySheet: false }),
   setMoveResult: (result) => set({ moveResult: result }),
+  invalidateBoard: () => set((s) => ({ boardVersion: s.boardVersion + 1 })),
+  openMilestoneJumpSheet: (milestone) => set({ selectedMilestone: milestone, showingMilestoneJumpSheet: true }),
+  closeMilestoneJumpSheet: () => set({ showingMilestoneJumpSheet: false }),
 }));
