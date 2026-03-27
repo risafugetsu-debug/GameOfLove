@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game of Love — Legal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0010;
+      color: #d0a8c0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a0030;
+      border-bottom: 1px solid #2a0050;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header .logo-emoji { font-size: 22px; }
+
+    header .logo-text {
+      color: #ff6eb4;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .tabs {
+      background: #1a0030;
+      border-bottom: 1px solid #2a0050;
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      user-select: none;
+    }
+
+    .tab.active {
+      color: #ff6eb4;
+      border-bottom-color: #ff6eb4;
+    }
+
+    .tab:hover:not(.active) { color: #999; }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    h1 {
+      color: #ff6eb4;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .meta {
+      color: #555;
+      font-size: 12px;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #2a0050;
+    }
+
+    h3 {
+      color: #ff6eb4;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 32px 0 10px;
+    }
+
+    p { color: #b090a8; margin-bottom: 12px; }
+
+    a { color: #ff6eb4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      color: #ff6eb4;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 12px;
+      border-bottom: 1px solid #2a0050;
+    }
+
+    td {
+      padding: 10px 12px;
+      color: #b090a8;
+      border-bottom: 1px solid #1a0030;
+    }
+
+    ul {
+      padding-left: 20px;
+      color: #b090a8;
+      margin-bottom: 12px;
+    }
+
+    ul li { margin-bottom: 6px; }
+
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: #333;
+      font-size: 12px;
+      border-top: 1px solid #1a0030;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="logo-emoji">💝</span>
+    <span class="logo-text">Game of Love</span>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('privacy')">Privacy Policy</div>
+    <div class="tab" onclick="showTab('terms')">Terms & Conditions</div>
+  </div>
+
+  <div class="container">
+
+    <!-- Privacy Policy -->
+    <div class="page active" id="privacy">
+      <h1>Legal</h1>
+      <h2>Privacy Policy</h2>
+      <p class="meta">Effective March 27, 2026 &nbsp;·&nbsp; Risa Fugetsu &nbsp;·&nbsp; <a href="mailto:risa.editorial.project@gmail.com">risa.editorial.project@gmail.com</a></p>
+
+      <h3>1. Overview</h3>
+      <p>Game of Love is a personal relationship tracking game. We take your privacy seriously. This policy explains what data is collected, how it is used, and your rights regarding that data.</p>
+
+      <h3>2. Data We Collect</h3>
+      <p><strong style="color:#fff">Account Data (via Clerk)</strong><br>
+      When you create an account or sign in, authentication is handled by Clerk (clerk.com). Clerk may collect your email address, name, and OAuth profile information. <a href="https://clerk.com/privacy" target="_blank">Clerk's privacy policy</a> applies to this data.</p>
+
+      <p><strong style="color:#fff">Data You Enter in the App</strong><br>
+      The following is stored <strong style="color:#fff">locally on your device</strong> only and is never transmitted to our servers:</p>
+      <ul>
+        <li>Names and photos of people you add to your board</li>
+        <li>Date log entries (notes, vibes, timestamps)</li>
+        <li>Board positions and game progress</li>
+      </ul>
+
+      <p><strong style="color:#fff">Photos</strong><br>
+      If you add a photo to a person's profile, the app requests access to your photo library. Photos are stored locally on your device only. We do not upload photos to any server.</p>
+
+      <p><strong style="color:#fff">Data We Do NOT Collect</strong><br>
+      We do not collect location data, contacts, browsing history, or advertising identifiers.</p>
+
+      <h3>3. How We Use Your Data</h3>
+      <p>Account data is used solely for authentication. App data (names, logs, photos) stays on your device and is used only to run the app. We do not sell, share, or monetize any of your personal data.</p>
+
+      <h3>4. Third-Party Services</h3>
+      <table>
+        <tr><th>Service</th><th>Purpose</th><th>Privacy Policy</th></tr>
+        <tr><td>Clerk</td><td>User authentication</td><td><a href="https://clerk.com/privacy" target="_blank">clerk.com/privacy</a></td></tr>
+      </table>
+
+      <h3>5. Data Storage & Security</h3>
+      <p>All personal data you enter is stored locally on your device using SQLite. It is not backed up to our servers. If you delete the app, this data is permanently deleted. Account credentials are managed by Clerk.</p>
+
+      <h3>6. Children's Privacy</h3>
+      <p>The app is not intended for children under 13. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, contact us at <a href="mailto:risa.editorial.project@gmail.com">risa.editorial.project@gmail.com</a>.</p>
+
+      <h3>7. Your Rights</h3>
+      <ul>
+        <li>Delete your account at any time from within the app</li>
+        <li>Delete all local data by uninstalling the app</li>
+        <li>Contact us with any privacy questions or requests</li>
+      </ul>
+
+      <h3>8. Changes to This Policy</h3>
+      <p>We may update this policy from time to time. We will notify you of significant changes by updating the effective date above.</p>
+
+      <h3>9. Contact</h3>
+      <p>Risa Fugetsu &nbsp;·&nbsp; <a href="mailto:risa.editorial.project@gmail.com">risa.editorial.project@gmail.com</a></p>
+    </div>
+
+    <!-- Terms & Conditions -->
+    <div class="page" id="terms">
+      <h1>Legal</h1>
+      <h2>Terms & Conditions</h2>
+      <p class="meta">Effective March 27, 2026 &nbsp;·&nbsp; Risa Fugetsu &nbsp;·&nbsp; <a href="mailto:risa.editorial.project@gmail.com">risa.editorial.project@gmail.com</a></p>
+
+      <h3>1. Acceptance of Terms</h3>
+      <p>By downloading or using Game of Love, you agree to be bound by these Terms. If you do not agree, do not use the app.</p>
+
+      <h3>2. Description of the App</h3>
+      <p>Game of Love is a personal relationship tracking game that allows users to log and visualize their dating experiences on a game board. The app is intended for personal, non-commercial use.</p>
+
+      <h3>3. User Accounts</h3>
+      <ul>
+        <li>You must create an account to use the app</li>
+        <li>You are responsible for maintaining the security of your credentials</li>
+        <li>You must be at least 13 years old to create an account</li>
+        <li>You agree to provide accurate information when creating your account</li>
+      </ul>
+
+      <h3>4. Acceptable Use</h3>
+      <p>You agree not to use the app to harass, stalk, or harm any individual; enter false or misleading information with the intent to deceive others; attempt to reverse engineer or modify the app; or use the app for any unlawful purpose.</p>
+
+      <h3>5. Your Content</h3>
+      <p>All data you enter (names, photos, notes, logs) is yours. It is stored locally on your device. You are responsible for the accuracy and legality of the content you enter. We do not claim ownership of any content you create.</p>
+
+      <h3>6. Intellectual Property</h3>
+      <p>The app, including its design, graphics, and code, is owned by Risa Fugetsu and protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without express written permission.</p>
+
+      <h3>7. Disclaimer of Warranties</h3>
+      <p>The app is provided "as is" without warranties of any kind. We do not warrant that the app will be uninterrupted or error-free, that data will be preserved in all circumstances, or that the app will meet your specific requirements.</p>
+
+      <h3>8. Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, Risa Fugetsu shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the app, including loss of data.</p>
+
+      <h3>9. Termination</h3>
+      <p>We reserve the right to suspend or terminate your account at any time if you violate these Terms. You may delete your account at any time from within the app.</p>
+
+      <h3>10. Changes to These Terms</h3>
+      <p>We may update these Terms from time to time. Continued use of the app after changes constitutes acceptance of the updated Terms.</p>
+
+      <h3>11. Governing Law</h3>
+      <p>These Terms are governed by the laws of the jurisdiction in which Risa Fugetsu resides, without regard to conflict of law principles.</p>
+
+      <h3>12. Contact</h3>
+      <p>Risa Fugetsu &nbsp;·&nbsp; <a href="mailto:risa.editorial.project@gmail.com">risa.editorial.project@gmail.com</a></p>
+    </div>
+
+  </div>
+
+  <footer>© 2026 Risa Fugetsu · Game of Love</footer>
+
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
