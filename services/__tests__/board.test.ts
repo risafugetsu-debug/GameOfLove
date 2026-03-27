@@ -13,4 +13,10 @@ describe('logDate targetPosition', () => {
       throw new Error('cannot eliminate with a targetPosition');
     }).toThrow('cannot eliminate with a targetPosition');
   });
+
+  it('throws if targetPosition exceeds 30', () => {
+    expect(() => {
+      throw new Error('targetPosition cannot exceed 30');
+    }).toThrow('targetPosition cannot exceed 30');
+  });
 });
