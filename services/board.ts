@@ -30,10 +30,10 @@ export function logDate(
   if (targetPosition !== undefined) {
     if (vibe === 'eliminate') throw new Error('cannot eliminate with a targetPosition');
     if (targetPosition <= person.position) throw new Error('targetPosition must be greater than current position');
+    if (targetPosition > 30) throw new Error('targetPosition cannot exceed 30');
   }
 
-  // `let` so the targetPosition branch can reassign
-  let movement: number | null = vibeToMovement(vibe);
+  let movement: number | null = null;
   const entryId = uuid();
   const now = new Date();
 
@@ -61,6 +61,7 @@ export function logDate(
         .run();
     });
   } else {
+    movement = vibeToMovement(vibe);
     db.transaction((tx) => {
       tx.insert(dateEntries).values({
         id: entryId,

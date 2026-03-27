@@ -1,5 +1,3 @@
-import { logDate } from '../board';
-
 // These tests require the DB to be set up — they are integration tests.
 // Run: npx jest services/__tests__/board.test.ts
 
