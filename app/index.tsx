@@ -19,6 +19,8 @@ import { DateProfileSheet } from '@/components/sheets/DateProfileSheet';
 import { LogDateSheet } from '@/components/sheets/LogDateSheet';
 import { AddDateSheet } from '@/components/sheets/AddDateSheet';
 import { EditPersonSheet } from '@/components/sheets/EditPersonSheet';
+import { MilestoneJumpSheet } from '@/components/sheets/MilestoneJumpSheet';
+import type { Milestone } from '@/types';
 import { EliminateSheet } from '@/components/sheets/EliminateSheet';
 import { DateHistoryView } from '@/components/sheets/DateHistoryView';
 import { MoveCelebrationView } from '@/components/overlays/MoveCelebrationView';
@@ -27,6 +29,9 @@ export default function BoardScreen() {
   const openAddSheet = useBoardStore((s) => s.openAddSheet);
   const selectPerson = useBoardStore((s) => s.selectPerson);
   const boardVersion = useBoardStore((s) => s.boardVersion);
+  const openMilestoneJumpSheet = useBoardStore((s) => s.openMilestoneJumpSheet);
+  const showingMilestoneJumpSheet = useBoardStore((s) => s.showingMilestoneJumpSheet);
+  const closeMilestoneJumpSheet = useBoardStore((s) => s.closeMilestoneJumpSheet);
   const [boardSize, setBoardSize] = useState({ width: 0, height: 0 });
   const insets = useSafeAreaInsets();
 
@@ -55,6 +60,16 @@ export default function BoardScreen() {
     openAddSheet();
   };
 
+  const handleMilestoneTap = (milestone: Milestone) => {
+    const eligible = activePeople.filter((p) => p.position < milestone.position);
+    if (eligible.length === 0) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    openMilestoneJumpSheet(milestone);
+  };
+
   const allPeople = [
     ...activePeople,
     ...eliminatedPeople,
@@ -77,6 +92,7 @@ export default function BoardScreen() {
                 height={boardSize.height}
                 people={activePeople}
                 onPieceTap={handlePieceTap}
+                onMilestoneTap={handleMilestoneTap}
               />
             )}
             {activePeople.length === 0 && <EmptyBoardOverlay />}
@@ -106,6 +122,10 @@ export default function BoardScreen() {
           <EditPersonSheet />
           <EliminateSheet />
           <DateHistoryView />
+          <MilestoneJumpSheet
+            isVisible={showingMilestoneJumpSheet}
+            onClose={closeMilestoneJumpSheet}
+          />
         </SafeAreaView>
       </BottomSheetModalProvider>
       <MoveCelebrationView />
