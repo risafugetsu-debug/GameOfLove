@@ -13,6 +13,7 @@ interface PersonOnBoard {
   position: number;
   colorHex: string;
   photoData: string | null;
+  isFavorite: boolean;
   name: string;
 }
 
@@ -184,6 +185,7 @@ export function BoardPathView({ width, height, people, onPieceTap, onMilestoneTa
               position={person.position}
               colorHex={person.colorHex}
               photoData={person.photoData}
+              isFavorite={person.isFavorite}
               staggerIndex={staggerIndex}
               canvasWidth={width}
               canvasHeight={height}

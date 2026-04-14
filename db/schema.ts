@@ -8,6 +8,7 @@ export const datePeople = sqliteTable('date_people', {
   firstImpressionNote: text('first_impression_note'),
   position:            integer('position').notNull().default(0),
   isEliminated:        integer('is_eliminated', { mode: 'boolean' }).notNull().default(false),
+  isFavorite:          integer('is_favorite', { mode: 'boolean' }).notNull().default(false),
   eliminatedAt:        integer('eliminated_at', { mode: 'timestamp' }),
   createdAt:           integer('created_at', { mode: 'timestamp' }).notNull(),
 });

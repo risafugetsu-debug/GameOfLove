@@ -1,6 +1,7 @@
 import BottomSheet, { BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { useRef, useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
@@ -16,12 +17,12 @@ const VIBES: { vibe: Vibe; emoji: string; label: string }[] = [
   { vibe: 'meh',       emoji: '😐', label: 'Meh' },
   { vibe: 'stay',      emoji: '😬', label: 'Stay' },
   { vibe: 'ouch',      emoji: '💔', label: 'Ouch' },
-  { vibe: 'eliminate', emoji: '💀', label: 'Eliminate' },
+  { vibe: 'eliminate', emoji: '💀', label: 'Drop' },
 ];
 
 export function LogDateSheet() {
   const sheetRef = useRef<BottomSheet>(null);
-  const { showingLogSheet, closeLogSheet, selectedPersonId, setMoveResult } = useBoardStore();
+  const { showingLogSheet, closeLogSheet, selectedPersonId, setMoveResult, selectPerson, invalidateBoard } = useBoardStore();
   const snapPoints = useMemo(() => ['80%'], []);
 
   const [selectedVibe, setSelectedVibe] = useState<Vibe | null>(null);
@@ -48,9 +49,15 @@ export function LogDateSheet() {
     if (!selectedVibe || !selectedPersonId || saving) return;
     setSaving(true);
     try {
-      const result = await logDate(selectedPersonId, selectedVibe, note);
+      const result = logDate(selectedPersonId, selectedVibe, note);
+      invalidateBoard();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       closeLogSheet();
-      setMoveResult(result);
+      selectPerson(null);
+      setTimeout(() => setMoveResult(result), 700);
+    } catch (e: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Error', e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
@@ -63,6 +70,8 @@ export function LogDateSheet() {
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={closeLogSheet}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
       backgroundStyle={{ backgroundColor: colors.surface }}
       handleIndicatorStyle={{ backgroundColor: colors.textSecondary }}
     >

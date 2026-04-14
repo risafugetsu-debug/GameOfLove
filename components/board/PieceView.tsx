@@ -13,6 +13,7 @@ interface Props {
   position: number;
   colorHex: string;
   photoData: string | null;
+  isFavorite: boolean;
   staggerIndex: number;   // 0-based among pieces sharing same section
   canvasWidth: number;
   canvasHeight: number;
@@ -22,7 +23,7 @@ interface Props {
 const PIECE_RADIUS = 20;
 
 export function PieceView({
-  position, colorHex, photoData, staggerIndex, canvasWidth, canvasHeight, isNew,
+  position, colorHex, photoData, isFavorite, staggerIndex, canvasWidth, canvasHeight, isNew,
 }: Props) {
   const center = sectionCenter(position, canvasWidth, canvasHeight);
   const targetX = center.x + staggerIndex * 8 - PIECE_RADIUS;
@@ -47,7 +48,7 @@ export function PieceView({
   }));
 
   return (
-    <Animated.View style={[styles.piece, { width: PIECE_RADIUS * 2, height: PIECE_RADIUS * 2, borderRadius: PIECE_RADIUS, backgroundColor: colorHex, position: 'absolute', top: 0, left: 0 }, animStyle]}>
+    <Animated.View style={[styles.piece, { width: PIECE_RADIUS * 2, height: PIECE_RADIUS * 2, borderRadius: PIECE_RADIUS, backgroundColor: colorHex, borderWidth: isFavorite ? 2.5 : 0, borderColor: isFavorite ? '#ffd700' : 'transparent', position: 'absolute', top: 0, left: 0 }, animStyle]}>
       {photoData ? (
         <Image
           source={{ uri: `data:image/jpeg;base64,${photoData}` }}

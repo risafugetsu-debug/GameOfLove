@@ -1,6 +1,7 @@
 import BottomSheet, { BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { useRef, useEffect, useMemo, useState } from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
@@ -17,6 +18,7 @@ export function EliminateSheet() {
     selectedPersonId,
     selectPerson,
     setMoveResult,
+    invalidateBoard,
   } = useBoardStore();
   const snapPoints = useMemo(() => ['50%'], []);
 
@@ -38,14 +40,19 @@ export function EliminateSheet() {
     }
   }, [showingEliminateSheet]);
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!selectedPersonId || saving) return;
     setSaving(true);
     try {
-      const result = await logDate(selectedPersonId, 'eliminate', farewellNote.trim());
+      const result = logDate(selectedPersonId, 'eliminate', farewellNote.trim());
+      invalidateBoard();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       closeEliminateSheet();
-      selectPerson(null); // also close DateProfileSheet
+      selectPerson(null);
       setMoveResult(result);
+    } catch (e: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Error', e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
@@ -58,11 +65,13 @@ export function EliminateSheet() {
       snapPoints={snapPoints}
       enablePanDownToClose
       onClose={closeEliminateSheet}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
       backgroundStyle={{ backgroundColor: colors.surface }}
       handleIndicatorStyle={{ backgroundColor: colors.textSecondary }}
     >
       <BottomSheetView style={styles.content}>
-        <Text style={typography.subheading}>Eliminate {person?.name}?</Text>
+        <Text style={typography.subheading}>Drop {person?.name}?</Text>
         <Text style={[typography.caption, { color: colors.textSecondary, marginTop: 8, marginBottom: 16 }]}>
           They'll be removed from the board permanently.
         </Text>
@@ -78,7 +87,7 @@ export function EliminateSheet() {
 
         <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm} disabled={saving}>
           <Text style={[typography.body, { color: colors.text, fontWeight: '700' }]}>
-            {saving ? 'Eliminating...' : 'Eliminate 💀'}
+            {saving ? 'Dropping...' : 'Drop'}
           </Text>
         </TouchableOpacity>
 

@@ -1,6 +1,5 @@
 import { ScrollView, TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { colors, typography } from '@/constants/theme';
-import { currentMilestoneLabel } from '@/helpers/board';
 
 interface Person {
   id: string;
@@ -8,6 +7,8 @@ interface Person {
   colorHex: string;
   photoData: string | null;
   position: number;
+  isEliminated: boolean;
+  isFavorite: boolean;
 }
 
 interface Props {
@@ -16,6 +17,12 @@ interface Props {
 }
 
 export function DateChipRow({ people, onPress }: Props) {
+  const sorted = [...people].sort((a, b) => {
+    if (a.isFavorite && !b.isFavorite) return -1;
+    if (!a.isFavorite && b.isFavorite) return 1;
+    return 0;
+  });
+
   return (
     <ScrollView
       horizontal
@@ -23,41 +30,62 @@ export function DateChipRow({ people, onPress }: Props) {
       style={styles.scroll}
       contentContainerStyle={styles.content}
     >
-      {people.map((person) => (
+      {sorted.map((person) => (
         <TouchableOpacity
           key={person.id}
-          style={[styles.chip, { borderColor: person.colorHex }]}
+          style={[styles.item, person.isEliminated && styles.itemEliminated]}
           onPress={() => onPress(person.id)}
         >
-          <View style={[styles.avatar, { backgroundColor: person.colorHex }]}>
+          <View style={[styles.avatar, { borderColor: person.colorHex }]}>
             {person.photoData ? (
               <Image
                 source={{ uri: `data:image/jpeg;base64,${person.photoData}` }}
                 style={styles.avatarImg}
               />
             ) : (
-              <Text>🧑</Text>
+              <View style={[styles.avatarFallback, { backgroundColor: person.colorHex }]}>
+                <Text style={styles.avatarEmoji}>
+                  {person.isEliminated ? '\uD83D\uDC80' : '\uD83E\uDDD1'}
+                </Text>
+              </View>
             )}
           </View>
-          <View style={styles.chipText}>
-            <Text style={[typography.caption, { color: colors.text }]} numberOfLines={1}>
-              {person.name}
-            </Text>
-            <Text style={[typography.caption, { color: colors.textSecondary }]} numberOfLines={1}>
-              {currentMilestoneLabel(person.position)}
-            </Text>
-          </View>
+          <Text style={styles.name} numberOfLines={1}>
+            {person.isFavorite ? '⭐ ' : ''}{person.name}
+          </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
   );
 }
 
+const AVATAR_SIZE = 52;
+
 const styles = StyleSheet.create({
-  scroll: { height: 80, flexGrow: 0 },
-  content: { paddingHorizontal: 12, gap: 8, alignItems: 'center' },
-  chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1a0030', borderRadius: 24, borderWidth: 1, paddingRight: 12, overflow: 'hidden' },
-  avatar: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  avatarImg: { width: 48, height: 48, borderRadius: 24 },
-  chipText: { marginLeft: 8 },
+  scroll: { flexGrow: 0 },
+  content: { paddingHorizontal: 16, paddingVertical: 8, gap: 16, alignItems: 'center' },
+  item: { alignItems: 'center', width: 64 },
+  itemEliminated: { opacity: 0.4 },
+  avatar: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    borderWidth: 2,
+    overflow: 'hidden',
+  },
+  avatarImg: { width: AVATAR_SIZE, height: AVATAR_SIZE },
+  avatarFallback: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarEmoji: { fontSize: 24 },
+  name: {
+    marginTop: 4,
+    fontSize: 11,
+    color: colors.text,
+    textAlign: 'center',
+    width: 64,
+  },
 });

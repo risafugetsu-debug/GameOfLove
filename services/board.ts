@@ -64,7 +64,7 @@ export function logDate(
         .run();
     } else if (vibe === 'eliminate') {
       tx.update(datePeople)
-        .set({ isEliminated: true, eliminatedAt: now })
+        .set({ isEliminated: true, isFavorite: false, eliminatedAt: now })
         .where(eq(datePeople.id, personId))
         .run();
       isEliminated = true;
@@ -125,6 +125,20 @@ export async function editPerson(
     })
     .where(eq(datePeople.id, personId))
     .run();
+}
+
+export function toggleFavorite(personId: string): void {
+  const [person] = db.select().from(datePeople).where(eq(datePeople.id, personId)).all();
+  if (!person || person.isEliminated) return;
+
+  if (person.isFavorite) {
+    db.update(datePeople).set({ isFavorite: false }).where(eq(datePeople.id, personId)).run();
+  } else {
+    db.transaction((tx) => {
+      tx.update(datePeople).set({ isFavorite: false }).run();
+      tx.update(datePeople).set({ isFavorite: true }).where(eq(datePeople.id, personId)).run();
+    });
+  }
 }
 
 async function compressPhoto(uri: string): Promise<string> {

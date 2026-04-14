@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { db } from '@/db/client';
 import { datePeople, dateEntries } from '@/db/schema';
 import { useBoardStore } from '@/store/boardStore';
+import { toggleFavorite } from '@/services/board';
 import { currentMilestoneLabel } from '@/helpers/board';
 import { colors, typography } from '@/constants/theme';
 
@@ -54,17 +55,17 @@ export function DateProfileSheet() {
   const showMenu = () => {
     const options = ['Edit'];
     if (entryCount > 0) options.push('View Full History');
-    if (!person?.isEliminated) options.push('Eliminate');
+    if (!person?.isEliminated) options.push('Drop');
     options.push('Cancel');
 
     if (Platform.OS === 'ios') {
       ActionSheetIOS.showActionSheetWithOptions(
-        { options, cancelButtonIndex: options.length - 1, destructiveButtonIndex: options.indexOf('Eliminate') },
+        { options, cancelButtonIndex: options.length - 1, destructiveButtonIndex: options.indexOf('Drop') },
         (idx) => {
           const action = options[idx];
           if (action === 'Edit') openEditSheet();
           if (action === 'View Full History') openHistorySheet();
-          if (action === 'Eliminate') openEliminateSheet();
+          if (action === 'Drop') openEliminateSheet();
         },
       );
     } else {
@@ -73,11 +74,11 @@ export function DateProfileSheet() {
       Alert.alert('Options', undefined, [
         ...actionOptions.map((action) => ({
           text: action,
-          style: action === 'Eliminate' ? ('destructive' as const) : ('default' as const),
+          style: action === 'Drop' ? ('destructive' as const) : ('default' as const),
           onPress: () => {
             if (action === 'Edit') openEditSheet();
             if (action === 'View Full History') openHistorySheet();
-            if (action === 'Eliminate') openEliminateSheet();
+            if (action === 'Drop') openEliminateSheet();
           },
         })),
         { text: 'Cancel', style: 'cancel' },
@@ -85,10 +86,8 @@ export function DateProfileSheet() {
     }
   };
 
-  if (!person) return null;
-
-  const logCTADisabled = person.isEliminated || person.position === 30;
-  const logCTALabel = person.isEliminated
+  const logCTADisabled = !person || person.isEliminated || person.position === 30;
+  const logCTALabel = !person || person.isEliminated
     ? ''
     : person.position === 30
     ? 'Already The One 💝'
@@ -105,48 +104,58 @@ export function DateProfileSheet() {
       handleIndicatorStyle={{ backgroundColor: colors.textSecondary }}
     >
       <BottomSheetView style={styles.content}>
-        <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: person.colorHex }]}>
-            {person.photoData ? (
-              <Image source={{ uri: `data:image/jpeg;base64,${person.photoData}` }} style={styles.avatarImg} />
-            ) : (
-              <Text style={{ fontSize: 32 }}>🧑</Text>
+        {person && (
+          <>
+            <View style={styles.header}>
+              <View style={[styles.avatar, { backgroundColor: person.colorHex }]}>
+                {person.photoData ? (
+                  <Image source={{ uri: `data:image/jpeg;base64,${person.photoData}` }} style={styles.avatarImg} />
+                ) : (
+                  <Text style={{ fontSize: 32 }}>🧑</Text>
+                )}
+              </View>
+              <View style={styles.nameBlock}>
+                <Text style={typography.subheading}>{person.name}</Text>
+                <Text style={[typography.caption, { color: colors.accent }]}>
+                  {currentMilestoneLabel(person.position)}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => { toggleFavorite(person.id); }}
+                style={styles.menuBtn}
+              >
+                <Text style={{ fontSize: 20 }}>{person.isFavorite ? '⭐' : '☆'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={showMenu} style={styles.menuBtn}>
+                <Text style={[typography.body, { color: colors.textSecondary }]}>···</Text>
+              </TouchableOpacity>
+            </View>
+
+            {recentEntries.map((entry) => (
+              <View key={entry.id} style={styles.entryRow}>
+                <Text style={{ fontSize: 20 }}>{VIBE_EMOJI[entry.vibe]}</Text>
+                <Text style={[typography.caption, { flex: 1, marginLeft: 8 }]} numberOfLines={1}>
+                  {entry.note || '—'}
+                </Text>
+                <Text style={[typography.caption, { color: colors.textSecondary }]}>
+                  {entry.loggedAt ? formatDistanceToNow(entry.loggedAt, { addSuffix: true }) : ''}
+                </Text>
+              </View>
+            ))}
+
+            {!logCTADisabled && (
+              <TouchableOpacity style={styles.logBtn} onPress={openLogSheet}>
+                <Text style={[typography.body, { color: colors.bg, fontWeight: '700' }]}>
+                  Log New Date
+                </Text>
+              </TouchableOpacity>
             )}
-          </View>
-          <View style={styles.nameBlock}>
-            <Text style={typography.subheading}>{person.name}</Text>
-            <Text style={[typography.caption, { color: colors.accent }]}>
-              {currentMilestoneLabel(person.position)}
-            </Text>
-          </View>
-          <TouchableOpacity onPress={showMenu} style={styles.menuBtn}>
-            <Text style={[typography.body, { color: colors.textSecondary }]}>···</Text>
-          </TouchableOpacity>
-        </View>
-
-        {recentEntries.map((entry) => (
-          <View key={entry.id} style={styles.entryRow}>
-            <Text style={{ fontSize: 20 }}>{VIBE_EMOJI[entry.vibe]}</Text>
-            <Text style={[typography.caption, { flex: 1, marginLeft: 8 }]} numberOfLines={1}>
-              {entry.note || '—'}
-            </Text>
-            <Text style={[typography.caption, { color: colors.textSecondary }]}>
-              {entry.loggedAt ? formatDistanceToNow(entry.loggedAt, { addSuffix: true }) : ''}
-            </Text>
-          </View>
-        ))}
-
-        {!logCTADisabled && (
-          <TouchableOpacity style={styles.logBtn} onPress={openLogSheet}>
-            <Text style={[typography.body, { color: colors.bg, fontWeight: '700' }]}>
-              Log New Date
-            </Text>
-          </TouchableOpacity>
-        )}
-        {logCTADisabled && logCTALabel !== '' && (
-          <View style={[styles.logBtn, { opacity: 0.5 }]}>
-            <Text style={[typography.body, { color: colors.bg }]}>{logCTALabel}</Text>
-          </View>
+            {logCTADisabled && logCTALabel !== '' && (
+              <View style={[styles.logBtn, { opacity: 0.5 }]}>
+                <Text style={[typography.body, { color: colors.bg }]}>{logCTALabel}</Text>
+              </View>
+            )}
+          </>
         )}
       </BottomSheetView>
     </BottomSheet>
