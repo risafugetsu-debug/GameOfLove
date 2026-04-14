@@ -9,10 +9,11 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0d0010"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.idontspeakengrish.GameOfLove"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,10 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "scheme": "gameoflove",
     "web": {
@@ -33,7 +37,9 @@
       "expo-sqlite",
       [
         "expo-image-picker",
-        { "photosPermission": "The app needs access to your photos to set a profile picture." }
+        {
+          "photosPermission": "The app needs access to your photos to set a profile picture."
+        }
       ]
     ]
   }
