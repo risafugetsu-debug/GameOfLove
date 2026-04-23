@@ -41,6 +41,13 @@
           "photosPermission": "The app needs access to your photos to set a profile picture."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "340aa774-b2b7-4d6d-bbaf-25ac5ddf7abb"
+      }
+    },
+    "owner": "idontspeakengrish"
   }
 }
