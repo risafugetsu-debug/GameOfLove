@@ -12,8 +12,11 @@
       "backgroundColor": "#0d0010"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.idontspeakengrish.GameOfLove"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.idontspeakengrish.GameOfLove",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
