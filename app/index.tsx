@@ -80,7 +80,7 @@ export default function BoardScreen() {
       <BottomSheetModalProvider>
         <SafeAreaView style={styles.root}>
           <View style={styles.header}>
-            <NeonTitle>Game of Love</NeonTitle>
+            <NeonTitle>Game of Luv</NeonTitle>
             <TouchableOpacity onPress={handleAddPress} style={styles.addBtn}>
               <Text style={[typography.body, { color: colors.accent }]}>+ Add</Text>
             </TouchableOpacity>
